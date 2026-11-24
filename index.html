@@ -6,6 +6,8 @@
 <title>Aravindkrishna R | Cloud DevOps Engineer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://api.counterapi.dev" crossorigin>
+<link rel="preconnect" href="https://abacus.jasoncameron.dev" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f4f7fb;--card:#fff;--ink:#0c1a2e;--mut:#55667d;--line:#dbe3ee;--a:#0a7f93;--b:#6b5cf0;--glow:rgba(10,127,147,.16);
@@ -334,19 +336,24 @@ var bar=document.getElementById("bar"),cloud=document.getElementById("cloud"),up
 function sc(){var h=document.documentElement,m=h.scrollHeight-innerHeight;var pc=m>0?h.scrollTop/m*100:0;bar.style.width=pc+"%";cloud.style.left=pc+"%";cloud.style.opacity=pc<1?0:1;up.classList.toggle("show",h.scrollTop>400);
 var r=tl.getBoundingClientRect(),p=(innerHeight*.6-r.top)/r.height*100;tl.style.setProperty("--p",Math.max(0,Math.min(100,p))+"%");document.querySelectorAll(".job").forEach(function(j){j.classList.toggle("lit",j.getBoundingClientRect().top+36<innerHeight*.6)})}
 addEventListener("scroll",sc,{passive:true});sc();
-(function(){var el=document.getElementById("vc"),bx=document.getElementById("vbox"),st=document.getElementById("vst"),ns="aravindkrishna-resume",k="visits",seen=false,cur=null,mode="";
+(function(){var GC="",ns="aravindkrishna-resume",k="visits",el=document.getElementById("vc"),bx=document.getElementById("vbox"),st=document.getElementById("vst"),cur=null,mode="",seen=false,tries=0,firstDone=false;
 try{seen=!!localStorage.getItem("ak_seen")}catch(e){}
-function j(u,f){return fetch(u,{cache:"no-store"}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(f)}
-function A(u){return j("https://api.counterapi.dev/v1/"+ns+"/"+k+(u?"/up":""),function(d){mode="A";return d.count})}
-function B(u){return j("https://abacus.jasoncameron.dev/"+(u?"hit/":"get/")+ns+"/"+k,function(d){mode="B";return d.value})}
-function set(n){n=+n;if(!isFinite(n))throw 0;bx.classList.add("on");st.textContent="LIVE";
-var from=cur===null?0:cur;if(n===cur)return;cur=n;el.classList.remove("bump");void el.offsetWidth;el.classList.add("bump");
-if(rm||from===n){el.textContent=n.toLocaleString();return}
-var t0=null;(function f(t){if(!t0)t0=t;var p=Math.min((t-t0)/900,1);el.textContent=Math.round(from+(n-from)*(1-Math.pow(1-p,3))).toLocaleString();if(p<1)requestAnimationFrame(f)})(performance.now())}
-function get(){var f=mode==="B"?B:A,g=mode==="B"?A:B;return f(false).catch(function(){return g(false)})}
-function tick(){if(document.hidden)return;get().then(set).catch(function(){st.textContent="OFFLINE";bx.classList.remove("on")})}
-try{(seen?get():A(true).catch(function(){return B(true)})).then(function(n){set(n);try{localStorage.setItem("ak_seen","1")}catch(e){}}).catch(function(){st.textContent="OFFLINE"});
-setInterval(tick,10000);document.addEventListener("visibilitychange",function(){if(!document.hidden)tick()})}catch(e){}})();
+function fmt(n){return n.toLocaleString()}
+function save(n){try{localStorage.setItem("ak_cnt",String(n))}catch(e){}}
+try{var c0=+localStorage.getItem("ak_cnt");if(c0>0){cur=c0;el.textContent=fmt(c0);st.textContent="UPDATING"}}catch(e){}
+function j(u){var ctl=window.AbortController?new AbortController():null,t=setTimeout(function(){if(ctl)ctl.abort()},4000);return fetch(u,{cache:"no-store",signal:ctl?ctl.signal:undefined}).then(function(r){clearTimeout(t);if(!r.ok)throw 0;return r.json()},function(e){clearTimeout(t);throw e})}
+function A(u){return j("https://api.counterapi.dev/v1/"+ns+"/"+k+(u?"/up":"")).then(function(d){mode="A";return d.count})}
+function B(u){return j("https://abacus.jasoncameron.dev/"+(u?"hit/":"get/")+ns+"/"+k).then(function(d){mode="B";return d.value})}
+function G(){return j("https://"+GC+".goatcounter.com/counter/TOTAL.json").then(function(d){return parseInt(String(d.count).replace(/\D/g,""),10)})}
+function read(){if(GC)return G();var f=mode==="B"?B:A,g=mode==="B"?A:B;return f(false).catch(function(){return g(false)})}
+function first(){if(GC)return G();return seen?read():A(true).catch(function(){return B(true)})}
+function set(n){n=+n;if(!isFinite(n))throw 0;bx.classList.add("on");st.textContent="LIVE";var from=cur===null?0:cur;if(n===cur)return;cur=n;el.classList.remove("bump");void el.offsetWidth;el.classList.add("bump");
+if(rm||from===n){el.textContent=fmt(n);return}
+var t0=null;(function f(t){if(!t0)t0=t;var p=Math.min((t-t0)/900,1);el.textContent=fmt(Math.round(from+(n-from)*(1-Math.pow(1-p,3))));if(p<1)requestAnimationFrame(f)})(performance.now())}
+function go(){(firstDone?read():first()).then(function(n){firstDone=true;seen=true;tries=0;try{localStorage.setItem("ak_seen","1")}catch(e){}set(n);save(n)}).catch(function(){if(cur===null)st.textContent="CONNECTING";else{st.textContent="RETRYING";bx.classList.remove("on")}setTimeout(go,Math.min(2000*(++tries),10000))})}
+function tick(){if(document.hidden||!firstDone)return;read().then(function(n){set(n);save(n)}).catch(function(){})}
+try{if(GC){var gs=document.createElement("script");gs.async=true;gs.setAttribute("data-goatcounter","https://"+GC+".goatcounter.com/count");gs.src="https://gc.zgo.at/count.js";document.head.appendChild(gs)}
+go();setInterval(tick,10000);document.addEventListener("visibilitychange",tick)}catch(e){}})();
 (function(){var Z=[["UTC","UTC","Universal"],["IST","Asia/Kolkata","India"],["","Europe/London","London","en-GB"],["","America/New_York","New York","en-US"],["","America/Chicago","Chicago","en-US"],["","America/Los_Angeles","Los Angeles","en-US"],["GST","Asia/Dubai","Dubai"],["SGT","Asia/Singapore","Singapore"],["JST","Asia/Tokyo","Tokyo"],["","Australia/Sydney","Sydney","en-AU"]];
 var g=document.getElementById("cgrp"),L=document.getElementById("lgrp");if(!g||!window.Intl)return;
 var F=Z.map(function(z){var o={timeZone:z[1]};return{t:new Intl.DateTimeFormat("en-GB",{timeZone:z[1],hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}),d:new Intl.DateTimeFormat("en-GB",{timeZone:z[1],weekday:"short",day:"2-digit",month:"short",year:"numeric"}),a:z[3]?new Intl.DateTimeFormat(z[3],{timeZone:z[1],timeZoneName:"short"}):null}});
